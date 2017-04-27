@@ -14,6 +14,7 @@ var rename          = require('gulp-rename');
 var plumber         = require('gulp-plumber');
 var concat          = require('gulp-concat');
 var changed         = require('gulp-changed');
+var del             = require('del');
 
 var paths = {
     dist        : 'dist/',
@@ -89,6 +90,12 @@ gulp.task('watch', function() {
 // 一括処理タスク
 // ====================
 gulp.task('default', ['html', 'css', 'js', 'image']);
+
+// distの中身を全削除
+// ※※※　distの中だけに動画ファイルとかおいていると全部消えるのでお気をつけください　※※※
+gulp.task('clean', function () {
+    return del([paths.dist + '**/*']);
+});
 
 
 //  JavaScript minify task
