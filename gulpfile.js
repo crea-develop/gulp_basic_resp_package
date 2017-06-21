@@ -17,6 +17,7 @@ var changed         = require('gulp-changed');
 var replace         = require('gulp-replace');
 var fs              = require('graceful-fs');
 var del             = require('del');
+var browserSync     = require('browser-sync');
 
 
 // =======================================================
@@ -123,14 +124,29 @@ gulp.task('copy', function () {
     .pipe(gulp.dest(paths.dist));
 });
 
+  // オートリロードタスク
+// ====================
+gulp.task('browser-sync', function() {
+    browserSync({
+        server: {
+            baseDir: "dist/",
+            index: "index.html"
+        }
+    });
+});
+gulp.task('bs-reload', function () {
+    browserSync.reload();
+});
+
 
 // 監視タスク
 // ====================
-gulp.task('watch', function() {
+gulp.task('watch', ['browser-sync'], function() {
     gulp.watch(paths.html, ['html']);
     gulp.watch(paths.css.src, ['css']);
     gulp.watch(paths.js.src,   ['js']);
     gulp.watch(paths.other, ['copy']);
+    gulp.watch('dist/**', ['bs-reload']);
 });
 
 
@@ -152,7 +168,7 @@ gulp.task('main_js', function() {
     gulp
     .src(paths.js.src)
     .pipe(plumber())
-    .pipe(uglify({preserveComments: 'some'}))
+    .pipe(uglify({output: {comments: "some"}}))
     .pipe(changed(paths.js.dist))
     .pipe(gulp.dest(paths.js.dist));
 });
@@ -163,7 +179,7 @@ gulp.task('common_js', function() {
     gulp
     .src(common_js_sort) // gulp/config.jsで設定
     .pipe(plumber())
-    .pipe(uglify({preserveComments: 'some'})) // minify
+    .pipe(uglify({output: {comments: "some"}})) // minify
     .pipe(changed(paths.js.dist))
     .pipe(concat('common.js'))                // 結合
     .pipe(gulp.dest(paths.js.dist));
